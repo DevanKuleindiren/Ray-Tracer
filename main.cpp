@@ -45,6 +45,7 @@ Colour *trace (Ray<double> ray) {
 
 
 int main() {
+
     populateScene();
 
     for (int row = 0; row < height; row++) {

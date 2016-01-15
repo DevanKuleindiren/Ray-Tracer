@@ -15,3 +15,14 @@ void Colour::legalise() {
     this->g = cap(g);
     this->b = cap(b);
 }
+
+Colour &Colour::operator*(double scalar) {
+    Colour *colour = new Colour(this->r, this->g, this->b);
+    if (scalar >= 0) {
+        colour->r = this->r *= scalar;
+        colour->g = this->g *= scalar;
+        colour->b = this->b *= scalar;
+        colour->legalise();
+    }
+    return *colour;
+}

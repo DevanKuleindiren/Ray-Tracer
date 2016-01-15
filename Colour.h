@@ -7,13 +7,14 @@
 
 #include "Vector3D.cpp"
 
-class Colour : public Vector3D<int> {
+class Colour {
 public:
     Colour (int r, int g, int b) : r(r), g(g), b(b) {}
     int r;
     int g;
     int b;
     void legalise ();
+    Colour &operator*(double scalar);
 };
 
 #endif //RAY_TRACER_COLOUR_H
