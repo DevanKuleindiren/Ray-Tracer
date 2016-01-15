@@ -14,6 +14,10 @@ SceneObject *objects[numberOfObjects];                  // Scene objects
 Vector3D<double> *lights[numberOfLights];               // Scene lights
 Colour *pixels[height][width];                          // Screen pixels
 
+const double ka = 0.3;                                  // Ambient reflection constant
+const double kd = 0.5;                                  // Diffuse reflection constant
+const double ks = 0.3;                                  // Specular reflection constant
+const double shininess = 5;                             // The power n in the specular reflection equation
 
 void populateScene () {
     // Add objects
@@ -73,7 +77,7 @@ int main() {
     for (SceneObject *object : objects) {
         delete object;
     }
-    
+
     // Close the file
     fileStream.close();
     return 0;

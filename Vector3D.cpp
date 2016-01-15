@@ -12,13 +12,13 @@ public:
     T x;
     T y;
     T z;
-    Vector3D<T> operator+(Vector3D<T> toAdd);
-    Vector3D<T> operator-(Vector3D<T> toAdd);
-    Vector3D<T> operator*(double toMultiply);
-    T operator*(Vector3D<T> toDotProd);
-    T magnitude ();
-    Vector3D<T> normalise ();
-    void printVector ();
+    virtual Vector3D<T> operator+(Vector3D<T> toAdd);
+    virtual Vector3D<T> operator-(Vector3D<T> toAdd);
+    virtual Vector3D<T> operator*(double toMultiply);
+    virtual T operator*(Vector3D<T> toDotProd);
+    virtual T magnitude ();
+    virtual Vector3D<T> normalise ();
+    virtual void printVector ();
 };
 
 template <class T> Vector3D<T> Vector3D<T>::operator+(Vector3D<T> toAdd) {
@@ -43,9 +43,12 @@ template <class T> T Vector3D<T>::magnitude() {
 
 template <class T> Vector3D<T> Vector3D<T>::normalise() {
     T magnitude = this->magnitude();
-    this->x /= magnitude;
-    this->y /= magnitude;
-    this->z /= magnitude;
+
+    if (magnitude > 0) {
+        this->x /= magnitude;
+        this->y /= magnitude;
+        this->z /= magnitude;
+    }
 
     return *this;
 }
