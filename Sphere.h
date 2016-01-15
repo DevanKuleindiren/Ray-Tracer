@@ -8,6 +8,8 @@
 #include "SceneObject.h"
 #include "Math.h"
 
+class IntersectionPoint;
+
 class Sphere : public SceneObject {
 private:
     Vector3D<double> center;

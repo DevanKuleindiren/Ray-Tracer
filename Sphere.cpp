@@ -3,6 +3,7 @@
 //
 
 #include "Sphere.h"
+#include "IntersectionPoint.h"
 
 IntersectionPoint Sphere::nearestIntersection (Ray<double> ray) {
 
@@ -21,7 +22,7 @@ IntersectionPoint Sphere::nearestIntersection (Ray<double> ray) {
         double x1 = (-b + sqrt(discriminant)) / (2 * a);
         double x2 = (-b - sqrt(discriminant)) / (2 * a);
 
-        return (x1 < x2 ? IntersectionPoint(x1, this->colour, true) : IntersectionPoint(x2, this->colour, true));
+        return (x1 < x2 ? IntersectionPoint(x1, this, true) : IntersectionPoint(x2, this, true));
     } else if (discriminant < -epsilon) {
         // No intersection
 
@@ -29,6 +30,6 @@ IntersectionPoint Sphere::nearestIntersection (Ray<double> ray) {
     } else {
         // One point of intersection
 
-        return IntersectionPoint(-b / (2 * a), this->colour, true);
+        return IntersectionPoint(-b / (2 * a), this, true);
     }
 }

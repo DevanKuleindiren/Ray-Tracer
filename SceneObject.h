@@ -5,15 +5,14 @@
 #ifndef RAY_TRACER_SCENEOBJECT_H
 #define RAY_TRACER_SCENEOBJECT_H
 
-#include "Vector3D.cpp"
 #include "Ray.cpp"
 #include "Colour.h"
-#include "IntersectionPoint.h"
+
+class IntersectionPoint;
 
 class SceneObject {
-protected:
-    Colour *colour;
 public:
+    Colour *colour;
     SceneObject (Colour *colour) : colour(colour) {}
     virtual IntersectionPoint nearestIntersection (Ray<double> ray) = 0;
     virtual ~SceneObject ();

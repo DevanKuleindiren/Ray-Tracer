@@ -5,15 +5,15 @@
 #ifndef RAY_TRACER_INTERSECTIONPOINT_H
 #define RAY_TRACER_INTERSECTIONPOINT_H
 
-#include "Colour.h"
+#include "Sphere.h"
 
 class IntersectionPoint {
 public:
     bool isIntersection;
     double distance;
-    Colour *colour;
-    IntersectionPoint (double distance, Colour *colour, bool isIntersection) : distance(distance), colour(colour),
-                                                                              isIntersection(isIntersection) {}
+    SceneObject *sceneObject;
+    IntersectionPoint (double distance, SceneObject *sceneObject, bool isIntersection) :
+            distance(distance), sceneObject(sceneObject), isIntersection(isIntersection) {}
 };
 
 

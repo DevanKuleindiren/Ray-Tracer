@@ -2,9 +2,7 @@
 #include <fstream>
 #include <iomanip>
 #include <float.h>
-#include "Colour.h"
-#include "SceneObject.h"
-#include "Sphere.h"
+#include "IntersectionPoint.h"
 
 Colour getColour (int row, int col) {
     Colour colour = {row % 255, (row % 255), (row % 255)};
@@ -21,7 +19,7 @@ int main() {
     Colour *backgroundColor = new Colour (255, 255, 255);   // White background
 
     // Creating an array of objects
-    Sphere *objects[numberOfObjects];
+    SceneObject *objects[numberOfObjects];
     objects[0] = new Sphere(Vector3D<double>(0, 0, 20), 5, new Colour(255, 0, 0));
 
 
@@ -34,14 +32,14 @@ int main() {
                                       Vector3D<double>(col - (width / 2), row - (height / 2), width / 2));
 
             IntersectionPoint closestPoint(DBL_MAX, NULL, false);
-            for (Sphere *object : objects) {
+            for (SceneObject *object : objects) {
                 IntersectionPoint intersectionPoint = object->nearestIntersection(rayThroughPixel);
                 if (intersectionPoint.isIntersection && intersectionPoint.distance < closestPoint.distance) {
                     closestPoint = intersectionPoint;
                 }
             }
 
-            pixels[row][col] = (closestPoint.isIntersection ? closestPoint.colour : backgroundColor);
+            pixels[row][col] = (closestPoint.isIntersection ? closestPoint.sceneObject->colour : backgroundColor);
             if (row == 250 && col == 250) {
                 std::cout << "A: " << pixels[row][col]->r << ", " << pixels[row][col]->g << ", " << pixels[row][col]->b
                                    << std::endl;
@@ -74,8 +72,8 @@ int main() {
 
     // Clear up memory
     delete backgroundColor;
-    for (Sphere *sphere : objects) {
-        delete sphere;
+    for (SceneObject *object : objects) {
+        delete object;
     }
 
     fileStream.close();
