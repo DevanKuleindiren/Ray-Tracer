@@ -5,8 +5,6 @@
 #ifndef RAY_TRACER_COLOUR_H
 #define RAY_TRACER_COLOUR_H
 
-#include "Vector3D.cpp"
-
 class Colour {
 public:
     Colour (int r, int g, int b) : r(r), g(g), b(b) {}
@@ -15,6 +13,9 @@ public:
     int b;
     void legalise ();
     Colour &operator*(double scalar);
+    Colour &operator+(double scalar);
+    Colour &operator+(Colour &toAdd);
+    void printColour ();
 };
 
 #endif //RAY_TRACER_COLOUR_H

@@ -33,3 +33,10 @@ IntersectionPoint Sphere::nearestIntersection (Ray<double> ray) {
         return IntersectionPoint(-b / (2 * a), this, true);
     }
 }
+
+Vector3D<double> Sphere::getNormal(Vector3D<double> fromPoint) {
+    Vector3D<double> normal = fromPoint - center;
+    normal.normalise();
+
+    return normal;
+}

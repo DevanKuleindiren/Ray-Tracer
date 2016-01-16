@@ -15,6 +15,7 @@ public:
     Colour *colour;
     SceneObject (Colour *colour) : colour(colour) {}
     virtual IntersectionPoint nearestIntersection (Ray<double> ray) = 0;
+    virtual Vector3D<double> getNormal (Vector3D<double> fromPoint) = 0;
     virtual ~SceneObject ();
 };
 

@@ -18,11 +18,28 @@ void Colour::legalise() {
 
 Colour &Colour::operator*(double scalar) {
     Colour *colour = new Colour(this->r, this->g, this->b);
-    if (scalar >= 0) {
-        colour->r = this->r *= scalar;
-        colour->g = this->g *= scalar;
-        colour->b = this->b *= scalar;
-        colour->legalise();
-    }
+    colour->r = (int) round (this->r * scalar);
+    colour->g = (int) round (this->g * scalar);
+    colour->b = (int) round (this->b * scalar);
+    colour->legalise();
     return *colour;
+}
+
+Colour &Colour::operator+(double scalar) {
+    Colour *colour = new Colour(this->r, this->g, this->b);
+    colour->r = (int) round (this->r + scalar);
+    colour->g = (int) round (this->g + scalar);
+    colour->b = (int) round (this->b + scalar);
+    colour->legalise();
+    return *colour;
+}
+
+Colour &Colour::operator+(Colour &toAdd) {
+    Colour *colour = new Colour(this->r + toAdd.r, this->g + toAdd.g, this->b + toAdd.b);
+    colour->legalise();
+    return *colour;
+}
+
+void Colour::printColour() {
+    std::cout << "[" << r << "," << g << "," << b << "]" << std::endl;
 }
