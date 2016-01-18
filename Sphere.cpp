@@ -8,7 +8,6 @@
 IntersectionPoint Sphere::nearestIntersection (Ray<double> &ray) {
 
     // Calculate cooefficients of intersection quadratic
-
     double a = (ray.direction * ray.direction);
     double b = (ray.direction * this->center) * -2;
     double c = (this->center * this->center) - (radius * radius);
@@ -22,15 +21,16 @@ IntersectionPoint Sphere::nearestIntersection (Ray<double> &ray) {
         double x1 = (-b + sqrt(discriminant)) / (2 * a);
         double x2 = (-b - sqrt(discriminant)) / (2 * a);
 
-        return (x1 < x2 ? IntersectionPoint(x1, this, true) : IntersectionPoint(x2, this, true));
+        double result = (x1 < x2 ? x1 : x2);
+
+        return (result < 0 ? IntersectionPoint(0, NULL, false) : IntersectionPoint(result, this, true));
     } else if (discriminant < -epsilon) {
         // No intersection
-
         return IntersectionPoint(0, NULL, false);
     } else {
         // One point of intersection
-
-        return IntersectionPoint(-b / (2 * a), this, true);
+        double result = -b / (2 * a);
+        return (result < 0 ? IntersectionPoint(0, NULL, false) : IntersectionPoint(-b / (2 * a), this, true));
     }
 }
 
