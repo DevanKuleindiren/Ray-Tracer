@@ -28,7 +28,7 @@ void populateScene () {
     objects[0] = new Sphere(Vector3D<double>(0, 0, 10), 2, Vector3D<double>(255, 0, 0));
 
     // Add lights
-    lights[0] = new Light(Vector3D<double>(10, 10, 10), Vector3D<double>(255, 255, 255));
+    lights[0] = new Light(Vector3D<double>(-10, -10, 10), Vector3D<double>(255, 255, 255));
 }
 
 int colourCap (double colourChannel) {
@@ -103,7 +103,7 @@ int main() {
     fileStream << "P3" << std::endl;
     fileStream << sceneWidth << " " << sceneHeight << std::endl;
     fileStream << "255" << std::endl;
-    for (int row = 0; row < sceneHeight; row++) {
+    for (int row = sceneHeight - 1; row >=0; row--) {
         for (int col = 0; col < sceneWidth; col++) {
             fileStream << std::setw(4) << colourCap(pixels[row][col]->x);
             fileStream << std::setw(4) << colourCap(pixels[row][col]->y);
