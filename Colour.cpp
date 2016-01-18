@@ -2,6 +2,8 @@
 // Created by Devan Kuleindiren on 15/01/2016.
 //
 
+#include <math.h>
+#include <iostream>
 #include "Colour.h"
 
 int cap (int original) {

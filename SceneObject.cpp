@@ -3,7 +3,3 @@
 //
 
 #include "SceneObject.h"
-
-SceneObject::~SceneObject() {
-    delete colour;
-}

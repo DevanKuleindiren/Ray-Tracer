@@ -5,7 +5,7 @@
 #include "Sphere.h"
 #include "IntersectionPoint.h"
 
-IntersectionPoint Sphere::nearestIntersection (Ray<double> ray) {
+IntersectionPoint Sphere::nearestIntersection (Ray<double> &ray) {
 
     // Calculate cooefficients of intersection quadratic
 
@@ -34,8 +34,8 @@ IntersectionPoint Sphere::nearestIntersection (Ray<double> ray) {
     }
 }
 
-Vector3D<double> Sphere::getNormal(Vector3D<double> fromPoint) {
-    Vector3D<double> normal = fromPoint - center;
+Vector3D<double> Sphere::getNormal(Vector3D<double> *fromPoint) {
+    Vector3D<double> normal = *fromPoint - center;
     normal.normalise();
 
     return normal;
