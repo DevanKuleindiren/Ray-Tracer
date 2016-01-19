@@ -5,26 +5,26 @@
 #include "IntersectionPoint.h"
 #include "Light.h"
 
-#define RECURSION_LIMIT 10
+#define RECURSION_LIMIT 1
 
-const int sceneWidth   = 500;                                               // Width of scene
-const int sceneHeight  = 500;                                               // Height of scene
-const int numberOfObjects = 27;                                             // Number of scene objects
-const int numberOfLights = 1;                                               // Number of lights
+#define SCENE_WIDTH     500                                                 // Width of scene
+#define SCENE_HEIGHT    500                                                 // Height of scene
+#define NUM_OBJECTS     27                                                  // Number of scene objects
+#define NUM_LIGHTS      1                                                   // Number of lights
+
+#define KA              0.3                                                 // Ambient reflection constant
+#define KD              0.5                                                 // Diffuse reflection constant
+#define KS              0.3                                                 // Specular reflection constant
+#define SHININESS       5                                                   // nth power in specular reflection equation
+#define KR              0.8                                                 // Reflection constant for each object
 
 const double xFieldOfView = M_PI_4;                                         // x field of view = pi / 2
-const double yFieldOfView = (sceneHeight / sceneWidth) * xFieldOfView;      // y field of view
+const double yFieldOfView = (SCENE_HEIGHT / SCENE_WIDTH) * xFieldOfView;    // y field of view
 
-Vector3D<double> *backgroundColor = new Vector3D<double>(0, 0, 0);          // White background
-SceneObject *objects[numberOfObjects];                                      // Scene objects
-Light *lights[numberOfLights];                                              // Scene lights
-Vector3D<double> *pixels[sceneHeight][sceneWidth];                          // Screen pixels
-
-const double ka = 0.3;                                                      // Ambient reflection constant
-const double kd = 0.5;                                                      // Diffuse reflection constant
-const double ks = 0.3;                                                      // Specular reflection constant
-const double shininess = 5;                                                 // nth power in specular reflection equation
-const double kr = 0.8;                                                      // Reflection constant for each object
+Vector3D<double>    *backgroundColor        = new Vector3D<double>(0, 0, 0);// White background
+SceneObject         *objects[NUM_OBJECTS];                                  // Scene objects
+Light               *lights[NUM_LIGHTS];                                    // Scene lights
+Vector3D<double>    *pixels[SCENE_HEIGHT][SCENE_WIDTH];                     // Screen pixels
 
 void populateScene () {
     // Add objects
@@ -38,8 +38,6 @@ void populateScene () {
             }
         }
     }
-//    objects[0] = new Sphere(Vector3D<double>(0, 0, 30), 2, Vector3D<double>(255, 0, 0));
-//    objects[1] = new Sphere(Vector3D<double>(0, 5, 15), 2, Vector3D<double>(0, 255, 0));
 
     // Add lights
     lights[0] = new Light(Vector3D<double>(0, 10, 0), Vector3D<double>(255, 255, 255));
@@ -62,7 +60,7 @@ Vector3D<double> *shadeObject (Vector3D<double> &intersectionPoint,
     Vector3D<double> viewingVector = *rayDirection * -1;
     Vector3D<double> objectNormal = object.getNormal(&intersectionPoint);
 
-    Vector3D<double> ambient = object.colour * ka;
+    Vector3D<double> ambient = object.colour * KA;
     Vector3D<double> diffuse = Vector3D<double>(0, 0, 0);
     Vector3D<double> specular = Vector3D<double>(0, 0, 0);
 
@@ -95,8 +93,8 @@ Vector3D<double> *shadeObject (Vector3D<double> &intersectionPoint,
             if (lightVectorDotObjectNormal > 0) {
                 Vector3D<double> reflectedVector = (lightVector - (objectNormal * lightVectorDotObjectNormal * 2)).normalise();
 
-                diffuse = diffuse + ((light->colour * (lightVectorDotObjectNormal)) * kd);
-                specular = specular + ((light->colour * pow((reflectedVector * viewingVector * -1), shininess)) * ks);
+                diffuse = diffuse + ((light->colour * (lightVectorDotObjectNormal)) * KD);
+                specular = specular + ((light->colour * pow((reflectedVector * viewingVector * -1), SHININESS)) * KS);
             }
 
         }
@@ -108,7 +106,7 @@ Vector3D<double> *shadeObject (Vector3D<double> &intersectionPoint,
     Ray<double> *reflectedRay = new Ray<double> (intersectionPoint, reflectedRayVector);
 
     // Calculate the amount of reflection by recursing on the above ray
-    Vector3D<double> reflections = *trace(reflectedRay, recursionInvocationNumber + 1) * kr;
+    Vector3D<double> reflections = *trace(reflectedRay, recursionInvocationNumber + 1) * KR;
 
     return new Vector3D<double>(ambient + diffuse + specular + reflections);
 }
@@ -142,13 +140,13 @@ int main() {
 
     double screenWidth  = 2 * tan(xFieldOfView / 2);
     double screenHeight = 2 * tan(yFieldOfView / 2);
-    double xStep = screenWidth / sceneWidth;
-    double yStep = screenHeight / sceneHeight;
+    double xStep = screenWidth / SCENE_WIDTH;
+    double yStep = screenHeight / SCENE_HEIGHT;
     double x0 = -screenWidth / 2;
     double y0 = -screenHeight / 2;
 
-    for (int row = 0; row < sceneHeight; row++) {
-        for (int col = 0; col < sceneWidth; col++) {
+    for (int row = 0; row < SCENE_HEIGHT; row++) {
+        for (int col = 0; col < SCENE_WIDTH; col++) {
 
             if (row == 118 && col == 348) {
                 std::cout << "HOLD UP" << std::endl;
@@ -170,10 +168,10 @@ int main() {
     fileStream.open("/Users/devankuleindiren/Documents/Work/University/Part IB/Computer Graphics and Image "
                             "Processing/Supervisions/Supervision 4/Ray Tracer/scene.ppm");
     fileStream << "P3" << std::endl;
-    fileStream << sceneWidth << " " << sceneHeight << std::endl;
+    fileStream << SCENE_WIDTH << " " << SCENE_HEIGHT << std::endl;
     fileStream << "255" << std::endl;
-    for (int row = sceneHeight - 1; row >=0; row--) {
-        for (int col = 0; col < sceneWidth; col++) {
+    for (int row = SCENE_HEIGHT - 1; row >=0; row--) {
+        for (int col = 0; col < SCENE_WIDTH; col++) {
             fileStream << std::setw(4) << colourCap(pixels[row][col]->x);
             fileStream << std::setw(4) << colourCap(pixels[row][col]->y);
             fileStream << std::setw(4) << colourCap(pixels[row][col]->z);
