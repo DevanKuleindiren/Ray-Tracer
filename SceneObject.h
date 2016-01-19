@@ -6,7 +6,6 @@
 #define RAY_TRACER_SCENEOBJECT_H
 
 #include "Ray.cpp"
-#include "Colour.h"
 
 class IntersectionPoint;
 

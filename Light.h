@@ -5,7 +5,6 @@
 #ifndef RAY_TRACER_LIGHT_H
 #define RAY_TRACER_LIGHT_H
 
-#include "Colour.h"
 #include "Vector3D.cpp"
 
 class Light {

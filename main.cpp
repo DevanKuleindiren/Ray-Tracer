@@ -32,9 +32,9 @@ void populateScene () {
         for (int j = 0; j < 3; j++) {
             for (int k = 0; k < 3; k++) {
                 objects[(i * 9) + (j * 3) + k] =
-                        new Sphere(Vector3D<double>((i - 1) * 5, (j - 1) * 5, 25 + (k - 1) * 5),
+                        new Sphere(Vector3D<double>((i - 1) * 5, (j - 1.1) * 5, 25 + (k - 1) * 5),
                                    2,
-                                   Vector3D<double>(51 + 68 * i, 51 + 68 * j, 51 + 68 * (2 - k)));
+                                   Vector3D<double>(127.5 * i, 127.5 * j, 127.5 * (2 - k)));
             }
         }
     }
@@ -147,10 +147,6 @@ int main() {
 
     for (int row = 0; row < SCENE_HEIGHT; row++) {
         for (int col = 0; col < SCENE_WIDTH; col++) {
-
-            if (row == 118 && col == 348) {
-                std::cout << "HOLD UP" << std::endl;
-            }
 
             // Determine RAY
             Ray<double> rayThroughPixel =
