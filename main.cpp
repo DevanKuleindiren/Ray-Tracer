@@ -5,7 +5,7 @@
 #include "IntersectionPoint.h"
 #include "Light.h"
 
-#define RECURSION_LIMIT 1
+#define RECURSION_LIMIT 10
 
 #define SCENE_WIDTH     500                                                 // Width of scene
 #define SCENE_HEIGHT    500                                                 // Height of scene
