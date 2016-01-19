@@ -49,15 +49,15 @@ int colourCap (double colourChannel) {
     return (int) round(colourChannel);
 }
 
-Vector3D<double> *trace (Ray<double> *ray, int recursionInvocationNumber);
+Vector3D<double> *trace (Ray<double> &ray, int recursionInvocationNumber);
 
 
 Vector3D<double> *shadeObject (Vector3D<double> &intersectionPoint,
-                               Vector3D<double> *rayDirection,
+                               Vector3D<double> &rayDirection,
                                SceneObject &object,
                                int recursionInvocationNumber) {
 
-    Vector3D<double> viewingVector = *rayDirection * -1;
+    Vector3D<double> viewingVector = rayDirection * -1;
     Vector3D<double> objectNormal = object.getNormal(&intersectionPoint);
 
     Vector3D<double> ambient = object.colour * KA;
@@ -102,8 +102,8 @@ Vector3D<double> *shadeObject (Vector3D<double> &intersectionPoint,
 
     // Calculate the reflected ray
     Vector3D<double> reflectedRayVector =
-            (*rayDirection - (objectNormal * (*rayDirection * objectNormal) * 2)).normalise();
-    Ray<double> *reflectedRay = new Ray<double> (intersectionPoint, reflectedRayVector);
+            (rayDirection - (objectNormal * (rayDirection * objectNormal) * 2)).normalise();
+    Ray<double> reflectedRay = Ray<double> (intersectionPoint, reflectedRayVector);
 
     // Calculate the amount of reflection by recursing on the above ray
     Vector3D<double> reflections = *trace(reflectedRay, recursionInvocationNumber + 1) * KR;
@@ -112,13 +112,13 @@ Vector3D<double> *shadeObject (Vector3D<double> &intersectionPoint,
 }
 
 
-Vector3D<double> *trace (Ray<double> *ray, int recursionInvocationNumber) {
+Vector3D<double> *trace (Ray<double> &ray, int recursionInvocationNumber) {
     if (recursionInvocationNumber > RECURSION_LIMIT) return backgroundColor;
 
     // Find the closest intersection point
     IntersectionPoint closestPoint(DBL_MAX, NULL, false);
     for (SceneObject *object : objects) {
-        IntersectionPoint intersectionPoint = object->nearestIntersection(*ray);
+        IntersectionPoint intersectionPoint = object->nearestIntersection(ray);
         if (intersectionPoint.isIntersection && intersectionPoint.distance < closestPoint.distance) {
             closestPoint = intersectionPoint;
         }
@@ -128,9 +128,9 @@ Vector3D<double> *trace (Ray<double> *ray, int recursionInvocationNumber) {
     if (!closestPoint.isIntersection) return backgroundColor;
 
     // Otherwise, compute the intensity and apply that to the nearest object's colour
-    Vector3D<double> intersectionPoint = ray->position + (ray->direction * closestPoint.distance);
+    Vector3D<double> intersectionPoint = ray.position + (ray.direction * closestPoint.distance);
 
-    return shadeObject(intersectionPoint, &ray->direction, *closestPoint.sceneObject, recursionInvocationNumber);
+    return shadeObject(intersectionPoint, ray.direction, *closestPoint.sceneObject, recursionInvocationNumber);
 }
 
 
@@ -153,13 +153,11 @@ int main() {
             }
 
             // Determine RAY
-            Ray<double> *rayThroughPixel =
-                    new Ray<double>(Vector3D<double>(0, 0, 0),
-                                    Vector3D<double>(x0 + (col * xStep), y0 + (row * yStep), 1));
+            Ray<double> rayThroughPixel =
+                    Ray<double>(Vector3D<double>(0, 0, 0),
+                                Vector3D<double>(x0 + (col * xStep), y0 + (row * yStep), 1));
 
             pixels[row][col] = trace(rayThroughPixel, 0);
-
-            delete rayThroughPixel;
         }
     }
 
