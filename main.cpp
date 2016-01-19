@@ -5,9 +5,11 @@
 #include "IntersectionPoint.h"
 #include "Light.h"
 
+#define RECURSION_LIMIT 10
+
 const int sceneWidth   = 500;                                               // Width of scene
 const int sceneHeight  = 500;                                               // Height of scene
-const int numberOfObjects = 2;                                             // Number of scene objects
+const int numberOfObjects = 27;                                             // Number of scene objects
 const int numberOfLights = 1;                                               // Number of lights
 
 const double xFieldOfView = M_PI_4;                                         // x field of view = pi / 2
@@ -22,26 +24,25 @@ const double ka = 0.3;                                                      // A
 const double kd = 0.5;                                                      // Diffuse reflection constant
 const double ks = 0.3;                                                      // Specular reflection constant
 const double shininess = 5;                                                 // nth power in specular reflection equation
-const double kr = 0.5;                                                      // Reflection constant for each object
+const double kr = 0.8;                                                      // Reflection constant for each object
 
 void populateScene () {
-//    // Add objects
-//    for (int i = 0; i < 3; i++) {
-//        for (int j = 0; j < 3; j++) {
-//            for (int k = 0; k < 3; k++) {
-//                std::cout << (i * 9) + (j * 3) + k << std::endl;
-//                objects[(i * 9) + (j * 3) + k] =
-//                        new Sphere(Vector3D<double>((i - 1) * 5, (j - 1) * 5, 25 + (k - 1) * 5),
-//                                   2,
-//                                   Vector3D<double>(51 + 68 * i, 51 + 68 * j, 51 + 68 * (2 - k)));
-//            }
-//        }
-//    }
-    objects[0] = new Sphere(Vector3D<double>(-2, 0, 16), 2, Vector3D<double>(255, 0, 0));
-    objects[1] = new Sphere(Vector3D<double>(2, 0, 10), 2, Vector3D<double>(0, 255, 0));
+    // Add objects
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            for (int k = 0; k < 3; k++) {
+                objects[(i * 9) + (j * 3) + k] =
+                        new Sphere(Vector3D<double>((i - 1) * 5, (j - 1) * 5, 25 + (k - 1) * 5),
+                                   2,
+                                   Vector3D<double>(51 + 68 * i, 51 + 68 * j, 51 + 68 * (2 - k)));
+            }
+        }
+    }
+//    objects[0] = new Sphere(Vector3D<double>(0, 0, 30), 2, Vector3D<double>(255, 0, 0));
+//    objects[1] = new Sphere(Vector3D<double>(0, 5, 15), 2, Vector3D<double>(0, 255, 0));
 
     // Add lights
-    lights[0] = new Light(Vector3D<double>(-10, -10, 20), Vector3D<double>(255, 255, 255));
+    lights[0] = new Light(Vector3D<double>(0, 10, 0), Vector3D<double>(255, 255, 255));
 }
 
 int colourCap (double colourChannel) {
@@ -50,12 +51,13 @@ int colourCap (double colourChannel) {
     return (int) round(colourChannel);
 }
 
-Vector3D<double> *trace (Ray<double> *ray);
+Vector3D<double> *trace (Ray<double> *ray, int recursionInvocationNumber);
 
 
 Vector3D<double> *shadeObject (Vector3D<double> &intersectionPoint,
                                Vector3D<double> *rayDirection,
-                               SceneObject &object) {
+                               SceneObject &object,
+                               int recursionInvocationNumber) {
 
     Vector3D<double> viewingVector = *rayDirection * -1;
     Vector3D<double> objectNormal = object.getNormal(&intersectionPoint);
@@ -73,13 +75,18 @@ Vector3D<double> *shadeObject (Vector3D<double> &intersectionPoint,
 
         // Check whether the path to the light source is blocked
         Ray<double> rayToLight = Ray<double> (intersectionPoint, lightVector);
-        IntersectionPoint intersectionTowardLight = object.nearestIntersection(rayToLight);
+
+        // Find the closest intersection point
+        IntersectionPoint closestPoint(DBL_MAX, NULL, false);
+        for (SceneObject *obj : objects) {
+            IntersectionPoint intersectionPt = obj->nearestIntersection(rayToLight);
+            if (intersectionPt.isIntersection && intersectionPt.distance < closestPoint.distance) {
+                closestPoint = intersectionPt;
+            }
+        }
 
         // Check no objects block the light
-        if (!(intersectionTowardLight.isIntersection && intersectionTowardLight.distance < distanceToLight)) {
-
-            // Make light vector point at surface instead of light
-            lightVector = lightVector * -1;
+        if (!(closestPoint.isIntersection && closestPoint.distance < distanceToLight)) {
 
             // Precalculate the dot product between the light vector and object normal
             double lightVectorDotObjectNormal = lightVector * objectNormal;
@@ -101,13 +108,15 @@ Vector3D<double> *shadeObject (Vector3D<double> &intersectionPoint,
     Ray<double> *reflectedRay = new Ray<double> (intersectionPoint, reflectedRayVector);
 
     // Calculate the amount of reflection by recursing on the above ray
-    Vector3D<double> reflections = *trace(reflectedRay) * kr;
+    Vector3D<double> reflections = *trace(reflectedRay, recursionInvocationNumber + 1) * kr;
 
     return new Vector3D<double>(ambient + diffuse + specular + reflections);
 }
 
 
-Vector3D<double> *trace (Ray<double> *ray) {
+Vector3D<double> *trace (Ray<double> *ray, int recursionInvocationNumber) {
+    if (recursionInvocationNumber > RECURSION_LIMIT) return backgroundColor;
+
     // Find the closest intersection point
     IntersectionPoint closestPoint(DBL_MAX, NULL, false);
     for (SceneObject *object : objects) {
@@ -123,7 +132,7 @@ Vector3D<double> *trace (Ray<double> *ray) {
     // Otherwise, compute the intensity and apply that to the nearest object's colour
     Vector3D<double> intersectionPoint = ray->position + (ray->direction * closestPoint.distance);
 
-    return shadeObject(intersectionPoint, &ray->direction, *closestPoint.sceneObject);
+    return shadeObject(intersectionPoint, &ray->direction, *closestPoint.sceneObject, recursionInvocationNumber);
 }
 
 
@@ -140,16 +149,17 @@ int main() {
 
     for (int row = 0; row < sceneHeight; row++) {
         for (int col = 0; col < sceneWidth; col++) {
+
+            if (row == 118 && col == 348) {
+                std::cout << "HOLD UP" << std::endl;
+            }
+
             // Determine RAY
             Ray<double> *rayThroughPixel =
                     new Ray<double>(Vector3D<double>(0, 0, 0),
                                     Vector3D<double>(x0 + (col * xStep), y0 + (row * yStep), 1));
 
-            pixels[row][col] = trace(rayThroughPixel);
-
-            if (row == 240 && col == 245) {
-                std::cout << row << ", " << col << std::endl;
-            }
+            pixels[row][col] = trace(rayThroughPixel, 0);
 
             delete rayThroughPixel;
         }

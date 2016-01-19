@@ -8,9 +8,10 @@
 IntersectionPoint Sphere::nearestIntersection (Ray<double> &ray) {
 
     // Calculate cooefficients of intersection quadratic
+    Vector3D<double> rayPositionMinusCenter = ray.position - this->center;
     double a = (ray.direction * ray.direction);
-    double b = (ray.direction * this->center) * -2;
-    double c = (this->center * this->center) - (radius * radius);
+    double b = (ray.direction * rayPositionMinusCenter) * 2;
+    double c = (rayPositionMinusCenter * rayPositionMinusCenter) - (radius * radius);
 
     // Check discriminant
     double epsilon = 0.001;
